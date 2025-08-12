@@ -9,6 +9,7 @@ import (
 	"github.com/lskeey/websocket-chat/handlers"
 	"github.com/lskeey/websocket-chat/middleware"
 	"github.com/lskeey/websocket-chat/models"
+	"github.com/lskeey/websocket-chat/ws"
 )
 
 func main() {
@@ -25,11 +26,15 @@ func main() {
 
 	log.Println("Database migrated successfully!")
 
+	hub := ws.NewHub(DB)
+	go hub.Run()
+
 	router := gin.Default()
 
 	authHandler := &handlers.AuthHandler{DB: DB}
 	userHandler := &handlers.UserHandler{DB: DB}
 	messageHandler := &handlers.MessageHandler{DB: DB}
+	websocketHandler := &handlers.WebsocketHandler{Hub: hub}
 
 	api := router.Group("/api")
 	{
@@ -38,10 +43,12 @@ func main() {
 	}
 
 	protected := router.Group("/api")
-	protected.Use(middleware.AuthMiddleware()) // Apply middleware to this group
+	protected.Use(middleware.AuthMiddleware())
 	{
 		protected.GET("/users/search", userHandler.SearchUsers)
 		protected.GET("/messages/:recipient_id", messageHandler.GetMessages)
+
+		protected.GET("/ws", websocketHandler.ServeWs)
 	}
 
 	port := os.Getenv("APP_PORT")
