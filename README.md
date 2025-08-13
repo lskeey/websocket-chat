@@ -52,6 +52,20 @@ This method will automatically build the Go application and run the PostgreSQL d
     ```bash
     cp .env.example .env
     ```
+    Open the newly created `.env` file and **change the `DB_HOST` value** to match the database service name in `docker-compose.yml`.
+
+    ```dotenv
+    # .env
+    DB_HOST=db # <-- IMPORTANT: Use 'db', not 'localhost'
+    DB_PORT=5432
+    DB_USER=postgres
+    DB_PASSWORD=your_db_password
+    DB_NAME=your_db_name
+    DB_SSLMODE=disable
+
+    JWT_SECRET=your_jwt_secret_key
+    APP_PORT=8080
+    ```
 
 3.  **Build and Run with Docker Compose**
     Run the following command from the project's root directory. This command will build the Docker image for the Go application and start all services.
