@@ -70,6 +70,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
+		"username": user.Username,
 		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
 
